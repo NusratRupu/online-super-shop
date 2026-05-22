@@ -64,6 +64,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [cartTotal, setCartTotal] = useState(cartCount());
+  const [toast, setToast] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("nityomart_user") || "null");
 
@@ -144,9 +145,16 @@ export default function App() {
   }
 
   function handleAddToCart(product) {
+    if (currentUser && currentUser.role !== "customer") {
+      setToast("Vendor/Admin accounts cannot buy products. Please use a customer account.");
+      setTimeout(() => setToast(""), 2600);
+      return;
+    }
+
     addToCart(product, 1);
     setCartTotal(cartCount());
-    alert(`${product.name} added to cart`);
+    setToast(`${product.name} added to cart`);
+    setTimeout(() => setToast(""), 2200);
   }
 
   const accountHref =
@@ -196,9 +204,24 @@ export default function App() {
           >
             Shop
           </a>
-          <a href="/track-order">Track Order</a>
+          <a
+            href="/track-order"
+            onClick={(event) => {
+              if (currentUser?.role === "customer") {
+                event.preventDefault();
+                window.location.href = "/account";
+              } else if (currentUser?.role === "vendor") {
+                event.preventDefault();
+                window.location.href = "/vendor";
+              } else if (currentUser?.role === "admin") {
+                event.preventDefault();
+                window.location.href = "/admin";
+              }
+            }}
+          >
+            Track Order
+          </a>
           <a href={currentUser?.role === "vendor" ? "/vendor" : "/vendor-login"}>Vendor</a>
-          <a href="/admin">Admin</a>
           {!currentUser && <a href="/register">Register</a>}
           <button className="cart-btn" onClick={() => (window.location.href = "/cart")}>
             Cart ({cartTotal})
@@ -207,6 +230,7 @@ export default function App() {
         </nav>
       </header>
 
+      {toast && <div className="site-toast">{toast}</div>}
       <main>
         <section className="hero">
           <div className="hero-content">
@@ -277,4 +301,7 @@ export default function App() {
     </div>
   );
 }
+
+
+
 

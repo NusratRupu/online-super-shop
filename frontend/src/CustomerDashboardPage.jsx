@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import api from "./api/client";
 
 const orderSteps = ["pending", "confirmed", "processing", "shipped", "delivered"];
@@ -86,6 +86,7 @@ export default function CustomerDashboardPage() {
                 <OrderProgress status={order.status} />
 
                 <p><strong>Total:</strong> BDT {Number(order.total_amount).toFixed(0)}</p>
+                <p><strong>Phone:</strong> {order.customer_phone || user?.phone || "Not available"}</p>
                 <p><strong>Payment:</strong> Cash on Delivery</p>
                 <p><strong>Address:</strong> {order.delivery_address}</p>
 
@@ -105,3 +106,4 @@ export default function CustomerDashboardPage() {
     </div>
   );
 }
+

@@ -14,6 +14,22 @@ export default function CheckoutPage() {
   const cart = getCart();
   const user = JSON.parse(localStorage.getItem("nityomart_user") || "null");
 
+  if (!user || user.role !== "customer") {
+    return (
+      <div className="checkout-page">
+        <section className="checkout-success">
+          <h1>Customer Login Required</h1>
+          <p>Please login as a customer before placing an order. You can add items to cart without login, but checkout requires a customer account.</p>
+          <div className="checkout-success-actions">
+            <a href="/login?next=/checkout">Customer Login</a>
+            <a href="/register?next=/checkout">Create Account</a>
+            <a href="/cart">Back to Cart</a>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   const [form, setForm] = useState({
     customer_name: user?.name || "",
     customer_phone: user?.phone || "",
@@ -162,3 +178,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+

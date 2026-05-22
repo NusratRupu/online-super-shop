@@ -1,7 +1,12 @@
-const db = require("../config/db");
+﻿const db = require("../config/db");
 
 function makeOrderNumber() {
   return `NMB-${Date.now()}`;
+}
+
+function normalizePaymentMethod(method) {
+  const allowed = ["cash_on_delivery", "bkash", "nagad", "bank_transfer"];
+  return allowed.includes(method) ? method : "cash_on_delivery";
 }
 
 async function placeOrder(req, res) {
@@ -14,6 +19,7 @@ async function placeOrder(req, res) {
       customer_email,
       delivery_address,
       payment_method = "cash_on_delivery",
+      payment_reference,
       notes,
       items,
     } = req.body;
@@ -32,6 +38,18 @@ async function placeOrder(req, res) {
       });
     }
 
+    const finalPaymentMethod = normalizePaymentMethod(payment_method);
+
+    if (finalPaymentMethod !== "cash_on_delivery" && !payment_reference) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment reference is required for bKash, Nagad, or bank transfer",
+      });
+    }
+
+    const paymentStatus =
+      finalPaymentMethod === "cash_on_delivery" ? "pending" : "submitted";
+
     await connection.beginTransaction();
 
     let subtotal = 0;
@@ -40,10 +58,6 @@ async function placeOrder(req, res) {
     for (const item of items) {
       const productId = Number(item.product_id);
       const quantity = Number(item.quantity);
-
-      if (!productId || !quantity || quantity < 1) {
-        throw new Error("Invalid product or quantity");
-      }
 
       const [products] = await connection.query(
         `
@@ -88,8 +102,12 @@ async function placeOrder(req, res) {
     const [orderResult] = await connection.query(
       `
       INSERT INTO orders
-      (order_number, customer_id, customer_name, customer_phone, customer_email, delivery_address, payment_method, subtotal, delivery_charge, total_amount, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (
+        order_number, customer_id, customer_name, customer_phone, customer_email,
+        delivery_address, payment_method, payment_reference, payment_status,
+        subtotal, delivery_charge, total_amount, notes
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         orderNumber,
@@ -98,7 +116,9 @@ async function placeOrder(req, res) {
         customer_phone,
         customer_email || null,
         delivery_address,
-        payment_method,
+        finalPaymentMethod,
+        payment_reference || null,
+        paymentStatus,
         subtotal,
         deliveryCharge,
         totalAmount,
@@ -144,6 +164,9 @@ async function placeOrder(req, res) {
         delivery_charge: deliveryCharge,
         total_amount: totalAmount,
         status: "pending",
+        payment_method: finalPaymentMethod,
+        payment_reference: payment_reference || null,
+        payment_status: paymentStatus,
       },
     });
   } catch (error) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import api from "./api/client";
 
 export default function TrackOrderPage() {
@@ -67,7 +67,7 @@ export default function TrackOrderPage() {
             <h3>Order Found</h3>
             <p><strong>Order Number:</strong> {order.order_number}</p>
             <p><strong>Customer:</strong> {order.customer_name}</p>
-            <p><strong>Phone:</strong> {order.customer_phone}</p>
+            
             <p><strong>Status:</strong> <span className={`order-status ${order.status}`}>{order.status}</span></p>
             <p><strong>Total:</strong> BDT {Number(order.total_amount).toFixed(0)}</p>
             <p><strong>Address:</strong> {order.delivery_address}</p>
@@ -87,4 +87,5 @@ export default function TrackOrderPage() {
     </div>
   );
 }
+
 

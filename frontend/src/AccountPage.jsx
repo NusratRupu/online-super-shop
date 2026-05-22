@@ -1,8 +1,14 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import api from "./api/client";
+
+function getNextPath() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("next") || "";
+}
 
 export default function AccountPage() {
   const path = window.location.pathname;
+  const nextPath = getNextPath();
 
   const mode = useMemo(() => {
     if (path.includes("vendor-register")) return "vendor-register";
@@ -36,7 +42,7 @@ export default function AccountPage() {
 
     try {
       if (isRegister) {
-        const payload = {
+        const response = await api.post("/auth/register", {
           name: form.name,
           email: form.email,
           phone: form.phone,
@@ -45,15 +51,16 @@ export default function AccountPage() {
           shop_name: form.shop_name,
           shop_phone: form.shop_phone,
           shop_address: form.shop_address,
-        };
+        });
 
-        const response = await api.post("/auth/register", payload);
         setMessage(response.data.message || "Registration successful.");
 
         if (!isVendor) {
           setTimeout(() => {
-            window.location.href = "/login";
-          }, 1200);
+            window.location.href = nextPath
+              ? `/login?next=${encodeURIComponent(nextPath)}`
+              : "/login";
+          }, 900);
         }
 
         return;
@@ -79,6 +86,11 @@ export default function AccountPage() {
       localStorage.setItem("nityomart_token", token);
       localStorage.setItem("nityomart_user", JSON.stringify(user));
 
+      if (!isVendor && nextPath) {
+        window.location.href = nextPath;
+        return;
+      }
+
       window.location.href = isVendor ? "/vendor" : "/account";
     } catch (error) {
       setMessage(error.response?.data?.message || "Request failed.");
@@ -101,8 +113,8 @@ export default function AccountPage() {
 
         <p>
           {isVendor
-            ? "Register as a vendor/reseller to post and manage your product listings after admin approval."
-            : "Create an account to shop faster and view your orders from your dashboard."}
+            ? "Register as a vendor/reseller to post and manage your listings after admin approval."
+            : "Create an account to checkout and view your orders from your dashboard."}
         </p>
 
         {message && <div className="login-message">{message}</div>}
@@ -125,16 +137,16 @@ export default function AccountPage() {
           </>
         )}
 
-        <button type="submit">
-          {isRegister ? "Create Account" : "Login"}
-        </button>
+        <button type="submit">{isRegister ? "Create Account" : "Login"}</button>
 
         <div className="account-links">
           <a href="/">Back to Website</a>
           {isVendor ? (
             isRegister ? <a href="/vendor-login">Vendor Login</a> : <a href="/vendor-register">Register as Vendor</a>
           ) : (
-            isRegister ? <a href="/login">Customer Login</a> : <a href="/register">Create Customer Account</a>
+            isRegister
+              ? <a href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"}>Customer Login</a>
+              : <a href={nextPath ? `/register?next=${encodeURIComponent(nextPath)}` : "/register"}>Create Customer Account</a>
           )}
         </div>
       </form>
