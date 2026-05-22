@@ -181,7 +181,7 @@ export default function App() {
 
       <header className="topbar">
         <div className="brand">
-          <h1>NityoMart BD</h1>
+          <h1><a className="brand-home-link" href="/">NityoMart BD</a></h1>
           <p>Online Super Shop & Daily Essentials</p>
         </div>
 
@@ -301,6 +301,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

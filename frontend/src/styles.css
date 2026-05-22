@@ -1904,3 +1904,427 @@ nav a:hover,
   background: #fee2e2;
   color: #991b1b;
 }
+
+.admin-stock-notification {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  margin: 10px 0 14px;
+  z-index: 20;
+}
+
+.stock-bell-btn {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 18px;
+  background: #166534;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18);
+}
+
+.stock-bell-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+}
+
+.stock-notification-panel {
+  position: absolute;
+  top: 64px;
+  right: 0;
+  width: min(380px, 90vw);
+  max-height: 420px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #dbe5dd;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  padding: 14px;
+}
+
+.stock-notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #064e3b;
+  margin-bottom: 10px;
+}
+
+.stock-notification-header button {
+  border: 0;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.stock-notification-empty {
+  color: #64748b;
+  margin: 8px 0;
+}
+
+.stock-notification-list {
+  display: grid;
+  gap: 10px;
+}
+
+.stock-notification-list button {
+  text-align: left;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.stock-notification-list button:hover {
+  background: #f1f8f2;
+  border-color: #16a34a;
+}
+
+.stock-notification-list strong,
+.stock-notification-list span,
+.stock-notification-list em {
+  display: block;
+}
+
+.stock-notification-list strong {
+  color: #0f172a;
+}
+
+.stock-notification-list span {
+  color: #64748b;
+  font-size: 13px;
+  margin: 3px 0;
+}
+
+.stock-notification-list em {
+  color: #dc2626;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.dashboard-actions .admin-stock-notification {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dashboard-actions .stock-notification-panel {
+  top: 62px;
+  right: 0;
+}
+
+.admin-section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-section-title-row h2 {
+  margin: 0;
+}
+
+.admin-product-search {
+  width: min(460px, 100%);
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-size: 15px;
+}
+
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-actions .admin-stock-notification {
+  margin: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.stock-bell-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 16px;
+  background: #166534;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.stock-bell-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 23px;
+  height: 23px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  border: 2px solid #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-actions .stock-notification-panel {
+  position: absolute;
+  top: 62px;
+  right: 0;
+  width: min(390px, 92vw);
+  max-height: 430px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #dbe5dd;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  padding: 14px;
+  z-index: 999;
+}
+
+.stock-notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stock-notification-actions button,
+.stock-alert-clear {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #eaf6ee;
+  color: #166534;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.stock-alert-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.stock-alert-main {
+  text-align: left;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.stock-alert-main strong,
+.stock-alert-main span,
+.stock-alert-main em {
+  display: block;
+}
+
+.stock-alert-main em {
+  color: #dc2626;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.admin-section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-product-search {
+  width: min(460px, 100%);
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-size: 15px;
+}
+
+.brand-home-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-header-actions .admin-stock-notification {
+  margin: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-header-actions .stock-notification-panel {
+  position: absolute;
+  top: 62px;
+  right: 0;
+  z-index: 9999;
+}
+
+.stock-bell-btn {
+  background: #ffffff !important;
+  color: #166534 !important;
+  border: 2px solid #bbf7d0 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+.stock-bell-btn:hover {
+  background: #f0fdf4 !important;
+  border-color: #16a34a !important;
+}
+
+.stock-notification-panel {
+  right: 0 !important;
+}
+
+.stock-alert-main:hover {
+  background: #ecfdf5 !important;
+  border-color: #16a34a !important;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+.drawn-bell-btn {
+  background: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  color: #374151 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10) !important;
+}
+
+.drawn-bell-btn svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: #374151;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.drawn-bell-btn:hover {
+  background: #f8fafc !important;
+  border-color: #16a34a !important;
+}
+
+.stock-row-focus {
+  outline: 3px solid #16a34a;
+  outline-offset: -3px;
+  background: #ecfdf5 !important;
+}
+
+.admin-stock-notification {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawn-bell-btn,
+.stock-bell-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.drawn-bell-btn svg {
+  display: block;
+  margin: auto;
+}
+
+.admin-stock-notification:hover .stock-notification-panel {
+  display: block;
+}
+
+.admin-header-actions .drawn-bell-btn,
+.drawn-bell-btn {
+  width: 58px !important;
+  height: 58px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 18px !important;
+}
+
+.drawn-bell-btn .bell-svg {
+  width: 36px !important;
+  height: 36px !important;
+  display: block !important;
+  fill: none !important;
+  stroke: #374151 !important;
+  stroke-width: 2.4 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  margin: 0 !important;
+}
+
+.drawn-bell-btn:hover {
+  border-color: #16a34a !important;
+  background: #f8fafc !important;
+}
+
+.stock-close-text {
+  width: auto !important;
+  min-width: 68px !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+}
+
+.stock-alert-main {
+  cursor: pointer;
+}
+
+.stock-alert-main:hover {
+  background: #ecfdf5 !important;
+  border-color: #16a34a !important;
+}

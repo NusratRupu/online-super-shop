@@ -3,6 +3,7 @@ import api from "./api/client";
 import { getImageUrl } from "./utils/imageUrl";
 import AdminOrdersPanel from "./AdminOrdersPanel.jsx";
 import AdminStockPanel from "./AdminStockPanel.jsx";
+import AdminStockNotification from "./AdminStockNotification.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
 
 const emptyProductForm = {
@@ -31,8 +32,23 @@ const emptyCategoryForm = {
 };
 
 export default function AdminPage({ onLogout }) {
-  const [activePanel, setActivePanel] = useState("products");
+  const [activePanel, setActivePanel] = useState(() => localStorage.getItem("nityomart_admin_panel") || "products");
   const [products, setProducts] = useState([]);
+  const [productSearch, setProductSearch] = useState("");
+
+  async function loadProducts() {
+    try {
+      const [productResponse, categoryResponse] = await Promise.all([
+        api.get("/admin/products"),
+        api.get("/admin/categories"),
+      ]);
+
+      setProducts(productResponse.data.products || []);
+      setCategories(categoryResponse.data.categories || []);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to refresh products.");
+    }
+  }
   const [categories, setCategories] = useState([]);
   const [productForm, setProductForm] = useState(emptyProductForm);
   const [categoryForm, setCategoryForm] = useState(emptyCategoryForm);
@@ -227,6 +243,12 @@ export default function AdminPage({ onLogout }) {
   const lowStockProducts = products.filter((item) => Number(item.stock) <= 5).length;
   const resaleProducts = products.filter((item) => item.product_type === "resale").length;
 
+  const filteredAdminProducts = products.filter((product) => {
+    const query = productSearch.toLowerCase().trim();
+    const text = `${product.name} ${product.category_name} ${product.product_type} ${product.vendor_shop_name || product.seller_name || "NityoMart BD"}`.toLowerCase();
+    return !query || text.includes(query);
+  });
+
   return (
     <div className="admin-page">
       <header className="admin-header">
@@ -235,6 +257,7 @@ export default function AdminPage({ onLogout }) {
           <p>Manage products, categories, images, stock, and product status.</p>
         </div>
         <div className="admin-header-actions">
+          <AdminStockNotification products={products} onOpenStock={() => { loadProducts(); setActivePanel("stock"); }} />
           <a href="/">Back to Website</a>
           <button type="button" onClick={onLogout}>Logout</button>
         </div>
@@ -245,9 +268,7 @@ export default function AdminPage({ onLogout }) {
         <div><strong>{activeProducts}</strong><span>Active Products</span></div>
         <div><strong>{lowStockProducts}</strong><span>Low / Out Stock</span></div>
         <div><strong>{resaleProducts}</strong><span>Resale Items</span></div>
-      </section>
-
-      <div className="admin-tabs">
+      </section><div className="admin-tabs">
         <button className={activePanel === "products" ? "active" : ""} onClick={() => setActivePanel("products")}>
           Products
         </button>
@@ -342,7 +363,15 @@ export default function AdminPage({ onLogout }) {
           </section>
 
           <section className="admin-card">
-            <h2>Product List</h2>
+            <div className="admin-section-title-row">
+              <h2>Product List</h2>
+              <input
+                className="admin-product-search"
+                placeholder="Search products by name, category, type, seller..."
+                value={productSearch}
+                onChange={(event) => setProductSearch(event.target.value)}
+              />
+            </div>
 
             {loading ? (
               <p>Loading products...</p>
@@ -362,7 +391,7 @@ export default function AdminPage({ onLogout }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((product) => (
+                    {filteredAdminProducts.map((product) => (
                       <tr key={product.id}>
                         <td><img className="admin-thumb" src={getImageUrl(product.image_url)} alt={product.name} /></td>
                         <td><strong>{product.name}</strong><small>{product.category_name || "No Category"}</small></td>
@@ -387,7 +416,7 @@ export default function AdminPage({ onLogout }) {
       )}
 
       {activePanel === "orders" && <AdminOrdersPanel />}
-      {activePanel === "stock" && <AdminStockPanel />}
+      {activePanel === "stock" && <AdminStockPanel products={products} onStockChanged={loadProducts} />}
 
       {activePanel === "users" && <AdminUsersPanel />}
 
@@ -463,6 +492,18 @@ export default function AdminPage({ onLogout }) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
