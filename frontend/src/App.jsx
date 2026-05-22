@@ -4,6 +4,7 @@ import "./styles.css";
 import AdminPage from "./AdminPage.jsx";
 import LoginPage from "./LoginPage.jsx";
 import TrackOrderPage from "./TrackOrderPage.jsx";
+import AccountPage from "./AccountPage.jsx";
 import { getImageUrl } from "./utils/imageUrl";
 
 function getStockLabel(stock) {
@@ -55,6 +56,11 @@ function ProductCard({ product, onAddToCart }) {
 }
 
 export default function App() {
+  if (
+    ["/login", "/register", "/vendor-login", "/vendor-register"].includes(window.location.pathname)
+  ) {
+    return <AccountPage />;
+  }
   if (window.location.pathname.startsWith("/track-order")) {
     return <TrackOrderPage />;
   }
@@ -366,6 +372,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

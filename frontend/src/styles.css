@@ -993,3 +993,115 @@ section {
   color: #166534;
   font-weight: 900;
 }
+
+.account-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(120deg, rgba(22, 101, 52, 0.92), rgba(21, 128, 61, 0.72)),
+    url("https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600") center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.account-card {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+}
+
+.account-card h1 {
+  margin: 0;
+  color: #166534;
+  font-size: 34px;
+}
+
+.account-card h2 {
+  margin: 10px 0;
+}
+
+.account-card p {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.account-card input,
+.account-card textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.account-card textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.account-card button {
+  width: 100%;
+}
+
+.account-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.account-links a {
+  color: #166534;
+  font-weight: 900;
+}
+
+.user-status {
+  display: inline-block;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: capitalize;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.user-status.active,
+.user-status.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.user-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.user-status.blocked,
+.user-status.inactive,
+.user-status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.protected-admin {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #e8f5eb;
+  color: #166534;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.user-action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
