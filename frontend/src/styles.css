@@ -1835,3 +1835,72 @@ nav a:hover,
   font-weight: 900;
   margin: 12px 0;
 }
+
+.stock-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.stock-summary-row div {
+  background: #f1f8f2;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.stock-summary-row strong {
+  display: block;
+  color: #166534;
+  font-size: 28px;
+}
+
+.stock-summary-row span {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.admin-search-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 12px 0 18px;
+  font-size: 15px;
+}
+
+.stock-edit-row {
+  display: grid;
+  grid-template-columns: 90px 90px;
+  gap: 8px;
+}
+
+.stock-edit-row input {
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  padding: 9px;
+  width: 100%;
+}
+
+.stock-admin-badge {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.stock-admin-badge.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stock-admin-badge.low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stock-admin-badge.out {
+  background: #fee2e2;
+  color: #991b1b;
+}

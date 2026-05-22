@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import api from "./api/client";
 import { getImageUrl } from "./utils/imageUrl";
 import AdminOrdersPanel from "./AdminOrdersPanel.jsx";
+import AdminStockPanel from "./AdminStockPanel.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
 
 const emptyProductForm = {
@@ -259,6 +260,9 @@ export default function AdminPage({ onLogout }) {
         <button className={activePanel === "users" ? "active" : ""} onClick={() => setActivePanel("users")}>
           Users / Vendors
         </button>
+        <button className={activePanel === "stock" ? "active" : ""} onClick={() => setActivePanel("stock")}>
+          Stock
+        </button>
       </div>
 
       {message && <div className="admin-message">{message}</div>}
@@ -383,6 +387,7 @@ export default function AdminPage({ onLogout }) {
       )}
 
       {activePanel === "orders" && <AdminOrdersPanel />}
+      {activePanel === "stock" && <AdminStockPanel />}
 
       {activePanel === "users" && <AdminUsersPanel />}
 
@@ -458,6 +463,9 @@ export default function AdminPage({ onLogout }) {
     </div>
   );
 }
+
+
+
 
 
 
