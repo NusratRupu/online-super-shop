@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
@@ -8,11 +8,12 @@ const categoryRoutes = require("./src/routes/categoryRoutes");
 const productRoutes = require("./src/routes/productRoutes");
 const orderRoutes = require("./src/routes/orderRoutes");
 const adminProductRoutes = require("./src/routes/adminProductRoutes");
-const uploadRoutes = require("./src/routes/uploadRoutes");
 const adminCategoryRoutes = require("./src/routes/adminCategoryRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const adminOrderRoutes = require("./src/routes/adminOrderRoutes");
 const adminUserRoutes = require("./src/routes/adminUserRoutes");
+const vendorRoutes = require("./src/routes/vendorRoutes");
+const uploadRoutes = require("./src/routes/uploadRoutes");
 
 const app = express();
 
@@ -53,17 +54,21 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin/products", adminProductRoutes);
-app.use("/api/upload", uploadRoutes);
 app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/users", adminUserRoutes);
+app.use("/api/vendor", vendorRoutes);
+app.use("/api/upload", uploadRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`NityoMart BD API running on http://localhost:${PORT}`);
 });
+
+
+
 
 
 

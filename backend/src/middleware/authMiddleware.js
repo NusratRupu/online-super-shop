@@ -22,6 +22,21 @@ function requireAuth(req, res, next) {
   }
 }
 
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!token) return next();
+
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    req.user = null;
+  }
+
+  next();
+}
+
 function requireRole(...roles) {
   return function (req, res, next) {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -37,5 +52,6 @@ function requireRole(...roles) {
 
 module.exports = {
   requireAuth,
+  optionalAuth,
   requireRole,
 };

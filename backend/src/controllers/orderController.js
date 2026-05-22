@@ -83,15 +83,17 @@ async function placeOrder(req, res) {
     const deliveryCharge = subtotal >= 1000 ? 0 : 60;
     const totalAmount = subtotal + deliveryCharge;
     const orderNumber = makeOrderNumber();
+    const customerId = req.user?.role === "customer" ? req.user.id : null;
 
     const [orderResult] = await connection.query(
       `
       INSERT INTO orders
-      (order_number, customer_name, customer_phone, customer_email, delivery_address, payment_method, subtotal, delivery_charge, total_amount, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (order_number, customer_id, customer_name, customer_phone, customer_email, delivery_address, payment_method, subtotal, delivery_charge, total_amount, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         orderNumber,
+        customerId,
         customer_name,
         customer_phone,
         customer_email || null,
@@ -168,12 +170,7 @@ async function trackOrder(req, res) {
     }
 
     const [orders] = await db.query(
-      `
-      SELECT *
-      FROM orders
-      WHERE order_number = ? AND customer_phone = ?
-      LIMIT 1
-      `,
+      "SELECT * FROM orders WHERE order_number = ? AND customer_phone = ? LIMIT 1",
       [orderNumber, phone]
     );
 
@@ -184,10 +181,7 @@ async function trackOrder(req, res) {
       });
     }
 
-    const [items] = await db.query(
-      "SELECT * FROM order_items WHERE order_id = ?",
-      [orders[0].id]
-    );
+    const [items] = await db.query("SELECT * FROM order_items WHERE order_id = ?", [orders[0].id]);
 
     res.json({
       success: true,
@@ -205,7 +199,41 @@ async function trackOrder(req, res) {
   }
 }
 
+async function getMyOrders(req, res) {
+  try {
+    const [orders] = await db.query(
+      `
+      SELECT *
+      FROM orders
+      WHERE customer_id = ?
+      ORDER BY created_at DESC
+      `,
+      [req.user.id]
+    );
+
+    for (const order of orders) {
+      const [items] = await db.query(
+        "SELECT * FROM order_items WHERE order_id = ?",
+        [order.id]
+      );
+      order.items = items;
+    }
+
+    res.json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to load customer orders",
+      error: error.message,
+    });
+  }
+}
+
 module.exports = {
   placeOrder,
   trackOrder,
+  getMyOrders,
 };
