@@ -1,6 +1,13 @@
 ﻿import { useEffect, useState } from "react";
 import api from "./api/client";
 
+const paymentLabels = {
+  cash_on_delivery: "Cash on Delivery",
+  bkash: "bKash",
+  nagad: "Nagad",
+  bank_transfer: "Bank Transfer",
+};
+
 const orderSteps = ["pending", "confirmed", "processing", "shipped", "delivered"];
 
 function OrderProgress({ status }) {
@@ -45,6 +52,17 @@ export default function CustomerDashboardPage() {
     loadOrders();
   }, []);
 
+  async function cancelOrder(orderId) {
+    if (!confirm("Cancel this order? Product stock will be restored.")) return;
+
+    try {
+      await api.patch(`/orders/${orderId}/cancel`);
+      await loadOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to cancel order.");
+    }
+  }
+
   function logout() {
     localStorage.removeItem("nityomart_token");
     localStorage.removeItem("nityomart_user");
@@ -87,8 +105,15 @@ export default function CustomerDashboardPage() {
 
                 <p><strong>Total:</strong> BDT {Number(order.total_amount).toFixed(0)}</p>
                 <p><strong>Phone:</strong> {order.customer_phone || user?.phone || "Not available"}</p>
-                <p><strong>Payment:</strong> Cash on Delivery</p>
+                <p><strong>Payment:</strong> {paymentLabels[order.payment_method] || order.payment_method || "Cash on Delivery"}</p>
+                <p><strong>Payment Status:</strong> {order.payment_status || "pending"}</p>
                 <p><strong>Address:</strong> {order.delivery_address}</p>
+
+                {!["delivered", "cancelled", "rejected"].includes(order.status) && (
+                  <button className="cancel-order-btn" onClick={() => cancelOrder(order.id)}>
+                    Cancel Order
+                  </button>
+                )}
 
                 <div className="customer-order-items">
                   {order.items.map((item) => (
@@ -106,4 +131,5 @@ export default function CustomerDashboardPage() {
     </div>
   );
 }
+
 

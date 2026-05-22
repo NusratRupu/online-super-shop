@@ -255,8 +255,68 @@ async function getMyOrders(req, res) {
   }
 }
 
+async function cancelMyOrder(req, res) {
+  const connection = await db.getConnection();
+
+  try {
+    const { id } = req.params;
+
+    await connection.beginTransaction();
+
+    const [orders] = await connection.query(
+      "SELECT * FROM orders WHERE id = ? AND customer_id = ? FOR UPDATE",
+      [id, req.user.id]
+    );
+
+    if (orders.length === 0) {
+      throw new Error("Order not found");
+    }
+
+    const order = orders[0];
+
+    if (["delivered", "cancelled", "rejected"].includes(order.status)) {
+      throw new Error("This order cannot be cancelled now");
+    }
+
+    const [items] = await connection.query(
+      "SELECT product_id, quantity FROM order_items WHERE order_id = ?",
+      [id]
+    );
+
+    for (const item of items) {
+      await connection.query(
+        "UPDATE products SET stock = stock + ? WHERE id = ?",
+        [item.quantity, item.product_id]
+      );
+    }
+
+    await connection.query(
+      "UPDATE orders SET status = 'cancelled' WHERE id = ?",
+      [id]
+    );
+
+    await connection.commit();
+
+    res.json({
+      success: true,
+      message: "Order cancelled successfully.",
+    });
+  } catch (error) {
+    await connection.rollback();
+
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to cancel order",
+    });
+  } finally {
+    connection.release();
+  }
+}
+
 module.exports = {
   placeOrder,
   trackOrder,
   getMyOrders,
+  cancelMyOrder,
 };
+

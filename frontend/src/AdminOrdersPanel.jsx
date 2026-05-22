@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import api from "./api/client";
 
-const statuses = [
+const orderStatuses = [
   "pending",
   "confirmed",
   "processing",
@@ -11,20 +11,25 @@ const statuses = [
   "rejected",
 ];
 
+const paymentStatuses = ["pending", "submitted", "verified", "rejected"];
+
+const paymentLabels = {
+  cash_on_delivery: "Cash on Delivery",
+  bkash: "bKash",
+  nagad: "Nagad",
+  bank_transfer: "Bank Transfer",
+};
+
 export default function AdminOrdersPanel() {
   const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
 
   async function loadOrders() {
     try {
-      setLoading(true);
       const response = await api.get("/admin/orders");
       setOrders(response.data.orders || []);
     } catch (error) {
       setMessage(error.response?.data?.message || "Failed to load orders.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -32,81 +37,119 @@ export default function AdminOrdersPanel() {
     loadOrders();
   }, []);
 
-  async function updateStatus(orderId, status) {
+  async function updateOrderStatus(orderId, status) {
     try {
       await api.patch(`/admin/orders/${orderId}/status`, { status });
       setMessage("Order status updated successfully.");
       await loadOrders();
     } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to update order.");
+      setMessage(error.response?.data?.message || "Failed to update order status.");
+    }
+  }
+
+  async function updatePaymentStatus(orderId, payment_status) {
+    try {
+      await api.patch(`/admin/orders/${orderId}/payment`, { payment_status });
+      setMessage("Payment status updated successfully.");
+      await loadOrders();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to update payment status.");
     }
   }
 
   return (
     <section className="admin-card">
       <h2>Order Management</h2>
-      <p className="admin-subtitle">
-        Confirm, process, ship, deliver, cancel, or reject customer orders.
-      </p>
+      <p>Confirm orders, track delivery status, and verify bKash/Nagad/Bank payments.</p>
 
       {message && <div className="admin-message">{message}</div>}
 
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Customer</th>
-                <th>Products</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Change Status</th>
-              </tr>
-            </thead>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Products</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Order Status</th>
+              <th>Payment Status</th>
+            </tr>
+          </thead>
 
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td>
-                    <strong>{order.order_number}</strong>
-                    <small>{new Date(order.created_at).toLocaleString()}</small>
-                  </td>
-                  <td>
-                    <strong>{order.customer_name}</strong>
-                    <small>{order.customer_phone}</small>
-                    <small>{order.delivery_address}</small>
-                  </td>
-                  <td>
-                    <strong>{order.item_count} item(s)</strong>
-                    <small>{order.product_names}</small>
-                  </td>
-                  <td>BDT {Number(order.total_amount).toFixed(0)}</td>
-                  <td>
-                    <span className={`order-status ${order.status}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td>
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateStatus(order.id, e.target.value)}
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td>
+                  <strong>{order.order_number}</strong>
+                  <small>{new Date(order.created_at).toLocaleString()}</small>
+                </td>
+
+                <td>
+                  <strong>{order.customer_name}</strong>
+                  <small>{order.customer_phone}</small>
+                  <small>{order.delivery_address}</small>
+                </td>
+
+                <td>
+                  <strong>{order.items?.length || 0} item(s)</strong>
+                  {(order.items || []).map((item) => (
+                    <small key={item.id}>
+                      {item.product_name} × {item.quantity}
+                    </small>
+                  ))}
+                </td>
+
+                <td>BDT {Number(order.total_amount).toFixed(0)}</td>
+
+                <td>
+                  <strong>{paymentLabels[order.payment_method] || order.payment_method}</strong>
+                  {order.payment_reference && (
+                    <small>Ref: {order.payment_reference}</small>
+                  )}
+                </td>
+
+                <td>
+                  <span className={`order-status ${order.status}`}>{order.status}</span>
+                  <select
+                    value={order.status}
+                    onChange={(event) => updateOrderStatus(order.id, event.target.value)}
+                  >
+                    {orderStatuses.map((status) => (
+                      <option value={status} key={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+
+                <td>
+                  <span className={`payment-status ${order.payment_status || "pending"}`}>
+                    {order.payment_status || "pending"}
+                  </span>
+                  <select
+                    value={order.payment_status || "pending"}
+                    onChange={(event) => updatePaymentStatus(order.id, event.target.value)}
+                  >
+                    {paymentStatuses.map((status) => (
+                      <option value={status} key={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+
+            {orders.length === 0 && (
+              <tr>
+                <td colSpan="7">No orders found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
