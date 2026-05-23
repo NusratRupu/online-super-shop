@@ -237,6 +237,7 @@ export default function App() {
             Track Order
           </a>
           <a href={currentUser?.role === "vendor" ? "/vendor" : "/vendor-login"}>Vendor</a>
+          <a href={currentUser?.role === "deliveryman" ? "/deliveryman" : "/deliveryman-login"}>Deliveryman</a>
           {!currentUser && <a href="/register">Register</a>}
           <button className="cart-btn" onClick={() => (window.location.href = "/cart")}>
             Cart ({cartTotal})
