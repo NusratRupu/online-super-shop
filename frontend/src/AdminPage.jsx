@@ -4,6 +4,7 @@ import { getImageUrl } from "./utils/imageUrl";
 import AdminOrdersPanel from "./AdminOrdersPanel.jsx";
 import AdminStockPanel from "./AdminStockPanel.jsx";
 import AdminProductApprovalsPanel from "./AdminProductApprovalsPanel.jsx";
+import AdminGroupedProductsPanel from "./AdminGroupedProductsPanel.jsx";
 import AdminStockNotification from "./AdminStockNotification.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
 
@@ -98,10 +99,21 @@ export default function AdminPage({ onLogout }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      const uploadedUrl =
+        response.data.image_url ||
+        response.data.imageUrl ||
+        response.data.url ||
+        response.data.path ||
+        "";
+
+      if (!uploadedUrl) {
+        throw new Error("Upload succeeded but image URL was not returned.");
+      }
+
       if (target === "category") {
-        updateCategoryField("image_url", response.data.image_url);
+        updateCategoryField("image_url", uploadedUrl);
       } else {
-        updateProductField("image_url", response.data.image_url);
+        updateProductField("image_url", uploadedUrl);
       }
 
       setMessage("Image uploaded successfully.");
@@ -390,60 +402,13 @@ export default function AdminPage({ onLogout }) {
             </form>
           </section>
 
-          <section className="admin-card">
-            <div className="admin-section-title-row">
-              <h2>Product List</h2>
-              <input
-                className="admin-product-search"
-                placeholder="Search products by name, category, type, seller..."
-                value={productSearch}
-                onChange={(event) => setProductSearch(event.target.value)}
-              />
-            </div>
-
-            {loading ? (
-              <p>Loading products...</p>
-            ) : (
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Image</th>
-                      <th>Product</th>
-                      <th>Type</th>
-                      <th>Price</th>
-                      <th>Stock</th>
-                      <th>Seller</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAdminProducts.map((product) => (
-                      <tr key={product.id}>
-                        <td><img className="admin-thumb" src={getImageUrl(product.image_url)} alt={product.name} /></td>
-                        <td><strong>{product.name}</strong><small>{product.category_name || "No Category"}</small></td>
-                        <td>{product.product_type}</td>
-                        <td>BDT {Number(product.price).toFixed(0)}</td>
-                        <td className={Number(product.stock) <= 5 ? "low-stock-cell" : ""}>{product.stock} {product.unit}</td>
-                        <td>{product.vendor_shop_name || "NityoMart BD"}</td>
-                        <td>{product.is_active ? "Active" : "Disabled"}</td>
-                        <td>
-                          <button type="button" onClick={() => startEditProduct(product)}>Edit</button>
-                          {product.is_active ? (
-                          <button type="button" className="danger-btn" onClick={() => disableProduct(product.id)}>Disable</button>
-                        ) : (
-                          <button type="button" className="approve-btn" onClick={() => enableProduct(product.id)}>Enable</button>
-                        )}
-                          <button type="button" className="danger-btn hard-delete" onClick={() => deleteProduct(product.id)}>Delete</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+          <AdminGroupedProductsPanel
+            products={filteredAdminProducts}
+            onEdit={startEditProduct}
+            onDisable={disableProduct}
+            onEnable={enableProduct}
+            onDelete={deleteProduct}
+          />
         </>
       )}
 
@@ -525,6 +490,8 @@ export default function AdminPage({ onLogout }) {
     </div>
   );
 }
+
+
 
 
 
