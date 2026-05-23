@@ -1,20 +1,21 @@
-const express = require("express");
+﻿const express = require("express");
 const {
-  getVendorProducts,
-  createVendorProduct,
-  updateVendorProduct,
-  deleteVendorProduct,
+  getMyProducts,
+  createMyProduct,
+  updateMyProduct,
+  setMyProductOutOfStock,
+  deleteMyProduct,
 } = require("../controllers/vendorProductController");
 const { requireAuth, requireRole } = require("../middleware/authMiddleware");
-const { requireApprovedVendor } = require("../middleware/vendorMiddleware");
 
 const router = express.Router();
 
-router.use(requireAuth, requireRole("vendor"), requireApprovedVendor);
+router.use(requireAuth, requireRole("vendor"));
 
-router.get("/products", getVendorProducts);
-router.post("/products", createVendorProduct);
-router.put("/products/:id", updateVendorProduct);
-router.delete("/products/:id", deleteVendorProduct);
+router.get("/products", getMyProducts);
+router.post("/products", createMyProduct);
+router.put("/products/:id", updateMyProduct);
+router.patch("/products/:id/out-of-stock", setMyProductOutOfStock);
+router.delete("/products/:id", deleteMyProduct);
 
 module.exports = router;

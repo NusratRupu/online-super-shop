@@ -3,6 +3,7 @@ import api from "./api/client";
 import { getImageUrl } from "./utils/imageUrl";
 import AdminOrdersPanel from "./AdminOrdersPanel.jsx";
 import AdminStockPanel from "./AdminStockPanel.jsx";
+import AdminProductApprovalsPanel from "./AdminProductApprovalsPanel.jsx";
 import AdminStockNotification from "./AdminStockNotification.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
 
@@ -216,6 +217,18 @@ export default function AdminPage({ onLogout }) {
     await loadAdminData();
   }
 
+  async function enableProduct(productId) {
+    if (!window.confirm("Enable this product?")) return;
+
+    try {
+      await api.patch(`/admin/products/${productId}/enable`);
+      setMessage("Product enabled successfully.");
+      await loadAdminData();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to enable product.");
+    }
+  }
+
   async function deleteProduct(productId) {
     if (!window.confirm("Permanently delete this product?")) return;
     await api.delete(`/admin/products/${productId}`);
@@ -248,6 +261,18 @@ export default function AdminPage({ onLogout }) {
     const text = `${product.name} ${product.category_name} ${product.product_type} ${product.vendor_shop_name || product.seller_name || "NityoMart BD"}`.toLowerCase();
     return !query || text.includes(query);
   });
+  async function updateProductApproval(productId, approvalStatus) {
+    try {
+      await api.patch(`/admin/product-approval/${productId}/approval`, {
+        approval_status: approvalStatus,
+      });
+
+      setMessage(`Product ${approvalStatus} successfully.`);
+      await loadProducts();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to update product approval.");
+    }
+  }
 
   return (
     <div className="admin-page">
@@ -283,6 +308,9 @@ export default function AdminPage({ onLogout }) {
         </button>
         <button className={activePanel === "stock" ? "active" : ""} onClick={() => setActivePanel("stock")}>
           Stock
+        </button>
+        <button className={activePanel === "approvals" ? "active" : ""} onClick={() => setActivePanel("approvals")}>
+          Product Approvals
         </button>
       </div>
 
@@ -402,7 +430,11 @@ export default function AdminPage({ onLogout }) {
                         <td>{product.is_active ? "Active" : "Disabled"}</td>
                         <td>
                           <button type="button" onClick={() => startEditProduct(product)}>Edit</button>
+                          {product.is_active ? (
                           <button type="button" className="danger-btn" onClick={() => disableProduct(product.id)}>Disable</button>
+                        ) : (
+                          <button type="button" className="approve-btn" onClick={() => enableProduct(product.id)}>Enable</button>
+                        )}
                           <button type="button" className="danger-btn hard-delete" onClick={() => deleteProduct(product.id)}>Delete</button>
                         </td>
                       </tr>
@@ -417,6 +449,7 @@ export default function AdminPage({ onLogout }) {
 
       {activePanel === "orders" && <AdminOrdersPanel />}
       {activePanel === "stock" && <AdminStockPanel products={products} onStockChanged={loadProducts} />}
+      {activePanel === "approvals" && <AdminProductApprovalsPanel />}
 
       {activePanel === "users" && <AdminUsersPanel />}
 
@@ -492,6 +525,11 @@ export default function AdminPage({ onLogout }) {
     </div>
   );
 }
+
+
+
+
+
 
 
 

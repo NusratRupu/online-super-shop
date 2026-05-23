@@ -1,27 +1,35 @@
 ﻿const db = require("../config/db");
 
-function slugify(value) {
-  return String(value || "")
+function slugify(text) {
+  return String(text || "")
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+    .replace(/(^-|-$)+/g, "");
 }
 
-function inferProductType(condition) {
-  return condition === "new" ? "super_shop" : "resale";
+async function ensureApprovedVendor(userId) {
+  const [rows] = await db.query(
+    "SELECT approval_status FROM vendor_profiles WHERE user_id = ? LIMIT 1",
+    [userId]
+  );
+
+  if (rows.length === 0) throw new Error("Vendor profile not found.");
+  if (rows[0].approval_status !== "approved") {
+    throw new Error("Vendor account is not approved yet.");
+  }
 }
 
-async function getVendorProducts(req, res) {
+async function getMyProducts(req, res) {
   try {
+    await ensureApprovedVendor(req.user.id);
+
     const [products] = await db.query(
       `
-      SELECT 
-        p.*,
-        c.name AS category_name,
-        c.slug AS category_slug
+      SELECT p.*, c.name AS category_name, vp.shop_name AS vendor_shop_name
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN vendor_profiles vp ON vp.user_id = p.seller_id
       WHERE p.seller_id = ?
       ORDER BY p.created_at DESC
       `,
@@ -30,55 +38,55 @@ async function getVendorProducts(req, res) {
 
     res.json({ success: true, products });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load vendor products",
-      error: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 }
 
-async function createVendorProduct(req, res) {
+async function createMyProduct(req, res) {
   try {
+    await ensureApprovedVendor(req.user.id);
+
     const {
-      category_id,
       name,
-      description,
-      product_condition = "used_good",
+      category_id,
+      product_type,
+      product_condition,
       price,
       old_price,
-      stock = 1,
-      unit = "piece",
+      stock,
+      unit,
       image_url,
+      description,
     } = req.body;
 
-    if (!category_id || !name || !price) {
+    if (!name || !category_id || !price) {
       return res.status(400).json({
         success: false,
-        message: "Category, product name, and price are required",
+        message: "Product name, category, and price are required.",
       });
     }
 
-    const productType = inferProductType(product_condition);
+    const finalType = product_type === "resale" ? "resale" : "super_shop";
+    const finalCondition = finalType === "resale" ? product_condition || "used_good" : "new";
 
-    if (productType === "resale" && !old_price) {
+    if (finalType === "resale" && !old_price) {
       return res.status(400).json({
         success: false,
-        message: "Old/original price is required for used or resale products",
+        message: "Old/original price is required for resale or used products.",
       });
     }
 
     const slug = `${slugify(name)}-${Date.now()}`;
 
-    const [result] = await db.query(
+    await db.query(
       `
       INSERT INTO products
       (
-        seller_id, category_id, name, slug, description, product_type,
-        product_condition, price, old_price, stock, unit, image_url,
-        approval_status, is_featured, is_active
+        seller_id, category_id, name, slug, description,
+        product_type, product_condition, price, old_price,
+        stock, unit, image_url, approval_status, is_featured, is_active
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', FALSE, TRUE)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0, 0)
       `,
       [
         req.user.id,
@@ -86,97 +94,85 @@ async function createVendorProduct(req, res) {
         name,
         slug,
         description || "",
-        productType,
-        product_condition,
-        price,
-        old_price || null,
-        stock,
-        unit,
-        image_url || null,
+        finalType,
+        finalCondition,
+        Number(price),
+        old_price ? Number(old_price) : null,
+        Number(stock || 0),
+        unit || "pcs",
+        image_url || "",
       ]
     );
 
-    res.status(201).json({
+    res.json({
       success: true,
       message: "Product submitted successfully. Waiting for admin approval.",
-      product_id: result.insertId,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to create vendor product",
-      error: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 }
 
-async function updateVendorProduct(req, res) {
+async function updateMyProduct(req, res) {
   try {
+    await ensureApprovedVendor(req.user.id);
+
     const { id } = req.params;
-    const {
-      category_id,
-      name,
-      description,
-      product_condition = "used_good",
-      price,
-      old_price,
-      stock,
-      unit,
-      image_url,
-      is_active = true,
-    } = req.body;
 
     const [existing] = await db.query(
-      "SELECT id FROM products WHERE id = ? AND seller_id = ? LIMIT 1",
+      "SELECT id FROM products WHERE id = ? AND seller_id = ?",
       [id, req.user.id]
     );
 
     if (existing.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found or not owned by this vendor",
+        message: "Product not found or not owned by this vendor.",
       });
     }
 
-    const productType = inferProductType(product_condition);
+    const {
+      name,
+      category_id,
+      product_type,
+      product_condition,
+      price,
+      old_price,
+      stock,
+      unit,
+      image_url,
+      description,
+    } = req.body;
 
-    if (productType === "resale" && !old_price) {
+    const finalType = product_type === "resale" ? "resale" : "super_shop";
+    const finalCondition = finalType === "resale" ? product_condition || "used_good" : "new";
+
+    if (finalType === "resale" && !old_price) {
       return res.status(400).json({
         success: false,
-        message: "Old/original price is required for used or resale products",
+        message: "Old/original price is required for resale or used products.",
       });
     }
 
     await db.query(
       `
       UPDATE products
-      SET 
-        category_id = ?,
-        name = ?,
-        description = ?,
-        product_type = ?,
-        product_condition = ?,
-        price = ?,
-        old_price = ?,
-        stock = ?,
-        unit = ?,
-        image_url = ?,
-        is_active = ?,
-        approval_status = 'pending'
+      SET name = ?, category_id = ?, product_type = ?, product_condition = ?,
+          price = ?, old_price = ?, stock = ?, unit = ?, image_url = ?,
+          description = ?, approval_status = 'pending', is_active = 0
       WHERE id = ? AND seller_id = ?
       `,
       [
-        category_id,
         name,
+        category_id,
+        finalType,
+        finalCondition,
+        Number(price),
+        old_price ? Number(old_price) : null,
+        Number(stock || 0),
+        unit || "pcs",
+        image_url || "",
         description || "",
-        productType,
-        product_condition,
-        price,
-        old_price || null,
-        stock,
-        unit || "piece",
-        image_url || null,
-        is_active ? 1 : 0,
         id,
         req.user.id,
       ]
@@ -184,19 +180,41 @@ async function updateVendorProduct(req, res) {
 
     res.json({
       success: true,
-      message: "Product updated successfully. Waiting for admin re-approval.",
+      message: "Product updated and sent for admin review.",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update vendor product",
-      error: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 }
 
-async function deleteVendorProduct(req, res) {
+async function setMyProductOutOfStock(req, res) {
   try {
+    await ensureApprovedVendor(req.user.id);
+
+    const { id } = req.params;
+
+    const [result] = await db.query(
+      "UPDATE products SET stock = 0 WHERE id = ? AND seller_id = ?",
+      [id, req.user.id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found or not owned by this vendor.",
+      });
+    }
+
+    res.json({ success: true, message: "Product marked as out of stock." });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+}
+
+async function deleteMyProduct(req, res) {
+  try {
+    await ensureApprovedVendor(req.user.id);
+
     const { id } = req.params;
 
     const [result] = await db.query(
@@ -207,23 +225,20 @@ async function deleteVendorProduct(req, res) {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found or not owned by this vendor",
+        message: "Product not found or not owned by this vendor.",
       });
     }
 
-    res.json({ success: true, message: "Product deleted successfully" });
+    res.json({ success: true, message: "Product deleted successfully." });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete vendor product",
-      error: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 }
 
 module.exports = {
-  getVendorProducts,
-  createVendorProduct,
-  updateVendorProduct,
-  deleteVendorProduct,
+  getMyProducts,
+  createMyProduct,
+  updateMyProduct,
+  setMyProductOutOfStock,
+  deleteMyProduct,
 };
