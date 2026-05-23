@@ -9,6 +9,8 @@ import CartPage from "./CartPage.jsx";
 import CheckoutPage from "./CheckoutPage.jsx";
 import VendorDashboardPage from "./VendorDashboardPage.jsx";
 import CustomerResalePage from "./CustomerResalePage.jsx";
+import DeliverymanLoginPage from "./DeliverymanLoginPage.jsx";
+import DeliverymanDashboardPage from "./DeliverymanDashboardPage.jsx";
 import { getImageUrl } from "./utils/imageUrl";
 import { addToCart, cartCount } from "./utils/cartStore";
 import "./styles.css";
@@ -104,6 +106,14 @@ export default function App() {
 
   if (["/login", "/register", "/vendor-login", "/vendor-register"].includes(path)) {
     return <AccountPage />;
+  }
+
+  if (path === "/deliveryman-login") {
+    return <DeliverymanLoginPage />;
+  }
+
+  if (path === "/deliveryman" || path.startsWith("/deliveryman/")) {
+    return <DeliverymanDashboardPage />;
   }
 
   if (path === "/customer-resale" || path.startsWith("/customer-resale/")) {
@@ -306,6 +316,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

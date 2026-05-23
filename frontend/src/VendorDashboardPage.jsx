@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import api from "./api/client";
 import { getImageUrl } from "./utils/imageUrl";
+import SellerEarningsPanel from "./SellerEarningsPanel.jsx";
 
 const emptyForm = {
   id: null,
@@ -340,9 +341,11 @@ export default function VendorDashboardPage() {
         <button className={activePanel === "stock" ? "active" : ""} onClick={() => setActivePanel("stock")}>
           Stock
         </button>
+        <button className={activePanel === "earnings" ? "active" : ""} onClick={() => setActivePanel("earnings")}>
+          Earnings
+        </button>
       </div>
-
-      {message && <div className="admin-message">{message}</div>}
+{message && <div className="admin-message">{message}</div>}
 
       {activePanel === "products" && (
         <>
@@ -513,3 +516,4 @@ export default function VendorDashboardPage() {
     </div>
   );
 }
+

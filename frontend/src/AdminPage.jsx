@@ -4,6 +4,8 @@ import { getImageUrl } from "./utils/imageUrl";
 import AdminOrdersPanel from "./AdminOrdersPanel.jsx";
 import AdminStockPanel from "./AdminStockPanel.jsx";
 import AdminProductApprovalsPanel from "./AdminProductApprovalsPanel.jsx";
+import AdminDeliveryPanel from "./AdminDeliveryPanel.jsx";
+import AdminSalesRecordsPanel from "./AdminSalesRecordsPanel.jsx";
 import AdminGroupedProductsPanel from "./AdminGroupedProductsPanel.jsx";
 import AdminStockNotification from "./AdminStockNotification.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
@@ -324,6 +326,12 @@ export default function AdminPage({ onLogout }) {
         <button className={activePanel === "approvals" ? "active" : ""} onClick={() => setActivePanel("approvals")}>
           Product Approvals
         </button>
+        <button className={activePanel === "delivery" ? "active" : ""} onClick={() => setActivePanel("delivery")}>
+          Delivery
+        </button>
+        <button className={activePanel === "sales" ? "active" : ""} onClick={() => setActivePanel("sales")}>
+          Sales Records
+        </button>
       </div>
 
       {message && <div className="admin-message">{message}</div>}
@@ -415,6 +423,8 @@ export default function AdminPage({ onLogout }) {
       {activePanel === "orders" && <AdminOrdersPanel />}
       {activePanel === "stock" && <AdminStockPanel products={products} onStockChanged={loadProducts} />}
       {activePanel === "approvals" && <AdminProductApprovalsPanel />}
+      {activePanel === "delivery" && <AdminDeliveryPanel />}
+      {activePanel === "sales" && <AdminSalesRecordsPanel />}
 
       {activePanel === "users" && <AdminUsersPanel />}
 
@@ -490,6 +500,8 @@ export default function AdminPage({ onLogout }) {
     </div>
   );
 }
+
+
 
 
 

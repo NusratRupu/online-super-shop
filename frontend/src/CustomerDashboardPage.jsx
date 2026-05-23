@@ -63,6 +63,17 @@ export default function CustomerDashboardPage() {
     }
   }
 
+  async function confirmReceived(orderId) {
+    if (!confirm("Confirm that you received this order?")) return;
+
+    try {
+      await api.patch(`/customer/orders/${orderId}/confirm-received`);
+      await loadOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to confirm received order.");
+    }
+  }
+
   function logout() {
     localStorage.removeItem("nityomart_token");
     localStorage.removeItem("nityomart_user");
@@ -108,9 +119,17 @@ export default function CustomerDashboardPage() {
                 <p><strong>Phone:</strong> {order.customer_phone || user?.phone || "Not available"}</p>
                 <p><strong>Payment:</strong> {paymentLabels[order.payment_method] || order.payment_method || "Cash on Delivery"}</p>
                 <p><strong>Payment Status:</strong> {order.payment_status || "pending"}</p>
+                  <p><strong>Delivery Status:</strong> {order.delivery_status || "unassigned"}</p>
+                  <p><strong>Received:</strong> {order.customer_received ? "Confirmed" : "Not confirmed yet"}</p>
+
+                  {order.delivery_status === "delivered_by_deliveryman" && !order.customer_received && (
+                    <button className="confirm-received-btn" onClick={() => confirmReceived(order.id)}>
+                      Confirm Received
+                    </button>
+                  )}
                 <p><strong>Address:</strong> {order.delivery_address}</p>
 
-                {!["delivered", "cancelled", "rejected"].includes(order.status) && (
+                {!["delivered", "cancelled", "rejected"].includes(order.status) && order.delivery_status !== "delivered_by_deliveryman" && (
                   <button className="cancel-order-btn" onClick={() => cancelOrder(order.id)}>
                     Cancel Order
                   </button>
@@ -132,6 +151,9 @@ export default function CustomerDashboardPage() {
     </div>
   );
 }
+
+
+
 
 
 

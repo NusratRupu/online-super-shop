@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import api from "./api/client";
 import { getImageUrl } from "./utils/imageUrl";
+import SellerEarningsPanel from "./SellerEarningsPanel.jsx";
 
 const emptyForm = {
   id: null,
@@ -25,6 +26,7 @@ function getCurrentUser() {
 export default function CustomerResalePage() {
   const user = getCurrentUser();
 
+  const [activePanel, setActivePanel] = useState("products");
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [imageFile, setImageFile] = useState(null);
@@ -135,6 +137,7 @@ export default function CustomerResalePage() {
       description: product.description || "",
     });
 
+    setActivePanel("products");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -188,101 +191,118 @@ export default function CustomerResalePage() {
         <div><strong>{summary.low}</strong><span>Low / Out Stock</span></div>
       </section>
 
+      <div className="vendor-tabs">
+        <button className={activePanel === "products" ? "active" : ""} onClick={() => setActivePanel("products")}>
+          Products
+        </button>
+        <button className={activePanel === "earnings" ? "active" : ""} onClick={() => setActivePanel("earnings")}>
+          Earnings
+        </button>
+      </div>
+
+      {activePanel === "earnings" && (
+        <SellerEarningsPanel title="Customer Resale Earnings & Sale Records" />
+      )}
+
       {message && <div className="admin-message">{message}</div>}
 
-      <section className="vendor-card">
-        <h2>{form.id ? "Edit Resale Product" : "Post Resale Product"}</h2>
+      {activePanel === "products" && (
+        <>
+          <section className="vendor-card">
+            <h2>{form.id ? "Edit Resale Product" : "Post Resale Product"}</h2>
 
-        <form className="vendor-product-form" onSubmit={handleSubmit}>
-          <input placeholder="Product Name *" value={form.name} onChange={(e) => updateField("name", e.target.value)} required />
+            <form className="vendor-product-form" onSubmit={handleSubmit}>
+              <input placeholder="Product Name *" value={form.name} onChange={(e) => updateField("name", e.target.value)} required />
 
-          <select value={form.product_condition} onChange={(e) => updateField("product_condition", e.target.value)}>
-            <option value="used_like_new">Used - Like New</option>
-            <option value="used_good">Used - Good</option>
-            <option value="used_fair">Used - Fair</option>
-          </select>
+              <select value={form.product_condition} onChange={(e) => updateField("product_condition", e.target.value)}>
+                <option value="used_like_new">Used - Like New</option>
+                <option value="used_good">Used - Good</option>
+                <option value="used_fair">Used - Fair</option>
+              </select>
 
-          <input type="number" placeholder="Selling Price *" value={form.price} onChange={(e) => updateField("price", e.target.value)} required />
-          <input type="number" placeholder="Old / Original Price *" value={form.old_price} onChange={(e) => updateField("old_price", e.target.value)} required />
-          <input type="number" min="0" placeholder="Stock Quantity" value={form.stock} onChange={(e) => updateField("stock", e.target.value)} />
-          <input placeholder="Unit" value={form.unit} onChange={(e) => updateField("unit", e.target.value)} />
+              <input type="number" placeholder="Selling Price *" value={form.price} onChange={(e) => updateField("price", e.target.value)} required />
+              <input type="number" placeholder="Old / Original Price *" value={form.old_price} onChange={(e) => updateField("old_price", e.target.value)} required />
+              <input type="number" min="0" placeholder="Stock Quantity" value={form.stock} onChange={(e) => updateField("stock", e.target.value)} />
+              <input placeholder="Unit" value={form.unit} onChange={(e) => updateField("unit", e.target.value)} />
 
-          <div className="vendor-upload-box">
-            <strong>Upload Resale Product Image</strong>
-            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
-          </div>
+              <div className="vendor-upload-box">
+                <strong>Upload Resale Product Image</strong>
+                <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+              </div>
 
-          <input placeholder="Or paste direct image URL" value={form.image_url} onChange={(e) => updateField("image_url", e.target.value)} />
+              <input placeholder="Or paste direct image URL" value={form.image_url} onChange={(e) => updateField("image_url", e.target.value)} />
 
-          {form.image_url && (
-            <div className="image-preview-box">
-              <img src={getImageUrl(form.image_url)} alt="Preview" />
-              <small>{form.image_url}</small>
-            </div>
-          )}
-
-          <textarea placeholder="Product Description" value={form.description} onChange={(e) => updateField("description", e.target.value)} />
-
-          <div className="form-actions">
-            <button type="submit">{form.id ? "Update Resale Product" : "Submit Resale Product"}</button>
-            <button type="button" className="secondary-btn" onClick={resetForm}>Clear</button>
-          </div>
-        </form>
-      </section>
-
-      <section className="vendor-card">
-        <div className="admin-section-title-row">
-          <h2>My Resale Product List</h2>
-          <input
-            className="admin-product-search"
-            placeholder="Search my resale products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Product</th>
-                <th>Condition</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Approval</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr key={product.id}>
-                  <td><img className="admin-thumb" src={getImageUrl(product.image_url)} alt={product.name} /></td>
-                  <td><strong>{product.name}</strong><small>Resale Items</small></td>
-                  <td>{String(product.product_condition || "").replaceAll("_", " ")}</td>
-                  <td>BDT {Number(product.price).toFixed(0)}</td>
-                  <td className={Number(product.stock) <= 3 ? "low-stock-cell" : ""}>{product.stock} {product.unit}</td>
-                  <td><span className={`product-approval-badge ${product.approval_status || "pending"}`}>{product.approval_status || "pending"}</span></td>
-                  <td>{product.is_active ? "Active" : "Inactive"}</td>
-                  <td>
-                    <div className="user-action-row">
-                      <button type="button" onClick={() => editProduct(product)}>Edit</button>
-                      <button type="button" className="danger-btn" onClick={() => markOutOfStock(product.id)}>Out of Stock</button>
-                      <button type="button" className="delete-btn" onClick={() => deleteProduct(product.id)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {filteredProducts.length === 0 && (
-                <tr><td colSpan="8">No resale products found.</td></tr>
+              {form.image_url && (
+                <div className="image-preview-box">
+                  <img src={getImageUrl(form.image_url)} alt="Preview" />
+                  <small>{form.image_url}</small>
+                </div>
               )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+              <textarea placeholder="Product Description" value={form.description} onChange={(e) => updateField("description", e.target.value)} />
+
+              <div className="form-actions">
+                <button type="submit">{form.id ? "Update Resale Product" : "Submit Resale Product"}</button>
+                <button type="button" className="secondary-btn" onClick={resetForm}>Clear</button>
+              </div>
+            </form>
+          </section>
+
+          <section className="vendor-card">
+            <div className="admin-section-title-row">
+              <h2>My Resale Product List</h2>
+              <input
+                className="admin-product-search"
+                placeholder="Search my resale products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Condition</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Approval</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id}>
+                      <td><img className="admin-thumb" src={getImageUrl(product.image_url)} alt={product.name} /></td>
+                      <td><strong>{product.name}</strong><small>Resale Items</small></td>
+                      <td>{String(product.product_condition || "").replaceAll("_", " ")}</td>
+                      <td>BDT {Number(product.price).toFixed(0)}</td>
+                      <td className={Number(product.stock) <= 3 ? "low-stock-cell" : ""}>{product.stock} {product.unit}</td>
+                      <td><span className={`product-approval-badge ${product.approval_status || "pending"}`}>{product.approval_status || "pending"}</span></td>
+                      <td>{product.is_active ? "Active" : "Inactive"}</td>
+                      <td>
+                        <div className="user-action-row">
+                          <button type="button" onClick={() => editProduct(product)}>Edit</button>
+                          <button type="button" className="danger-btn" onClick={() => markOutOfStock(product.id)}>Out of Stock</button>
+                          <button type="button" className="delete-btn" onClick={() => deleteProduct(product.id)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {filteredProducts.length === 0 && (
+                    <tr><td colSpan="8">No resale products found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

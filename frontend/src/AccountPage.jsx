@@ -91,7 +91,7 @@ export default function AccountPage() {
         return;
       }
 
-      window.location.href = isVendor ? "/vendor" : "/account";
+      window.location.href = isVendor ? "/vendor" : "/";
     } catch (error) {
       setMessage(error.response?.data?.message || "Request failed.");
     }
@@ -153,3 +153,4 @@ export default function AccountPage() {
     </div>
   );
 }
+

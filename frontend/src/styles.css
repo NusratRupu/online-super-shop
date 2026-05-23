@@ -2699,3 +2699,80 @@ html {
   background: #166534;
   color: #ffffff;
 }
+
+.delivery-login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef8f0, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.delivery-login-card {
+  width: min(460px, 100%);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 34px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 16px;
+}
+
+.delivery-login-card h1 {
+  color: #0b6b32;
+  font-size: 36px;
+  margin: 0;
+}
+
+.delivery-login-card p {
+  color: #64748b;
+  margin: 0 0 8px;
+}
+
+.delivery-login-card input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 15px;
+  font-size: 16px;
+}
+
+.delivery-login-card button {
+  border: 0;
+  border-radius: 14px;
+  padding: 15px;
+  background: #166534;
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.delivery-login-card a {
+  text-align: center;
+  color: #166534;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.confirm-received-btn {
+  border: 0;
+  border-radius: 14px;
+  background: #166534;
+  color: #ffffff;
+  padding: 12px 18px;
+  font-weight: 900;
+  cursor: pointer;
+  margin: 12px 0;
+}
+
+.confirm-received-btn {
+  border: 0;
+  border-radius: 14px;
+  background: #166534;
+  color: #ffffff;
+  padding: 12px 18px;
+  font-weight: 900;
+  cursor: pointer;
+  margin: 12px 0;
+}
