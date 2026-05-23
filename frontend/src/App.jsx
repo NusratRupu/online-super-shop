@@ -8,6 +8,7 @@ import CustomerDashboardPage from "./CustomerDashboardPage.jsx";
 import CartPage from "./CartPage.jsx";
 import CheckoutPage from "./CheckoutPage.jsx";
 import VendorDashboardPage from "./VendorDashboardPage.jsx";
+import CustomerResalePage from "./CustomerResalePage.jsx";
 import { getImageUrl } from "./utils/imageUrl";
 import { addToCart, cartCount } from "./utils/cartStore";
 import "./styles.css";
@@ -103,6 +104,10 @@ export default function App() {
 
   if (["/login", "/register", "/vendor-login", "/vendor-register"].includes(path)) {
     return <AccountPage />;
+  }
+
+  if (path === "/customer-resale" || path.startsWith("/customer-resale/")) {
+    return <CustomerResalePage />;
   }
 
   if (path === "/vendor" || path.startsWith("/vendor/")) {
@@ -301,6 +306,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

@@ -77,6 +77,7 @@ export default function CustomerDashboardPage() {
           <p>Welcome, {user?.name}. Track your current and previous orders.</p>
         </div>
         <div className="dashboard-actions">
+          <a href="/customer-resale">Sell Resale Product</a>
           <a href="/">Back to Website</a>
           <button onClick={logout}>Logout</button>
         </div>
@@ -131,5 +132,6 @@ export default function CustomerDashboardPage() {
     </div>
   );
 }
+
 
 
