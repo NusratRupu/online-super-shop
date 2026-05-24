@@ -319,7 +319,7 @@ export default function AdminPage({ onLogout }) {
           Orders
         </button>
         <button className={activePanel === "users" ? "active" : ""} onClick={() => setActivePanel("users")}>
-          Users / Vendors
+          Users
         </button>
         <button className={activePanel === "stock" ? "active" : ""} onClick={() => setActivePanel("stock")}>
           Stock
