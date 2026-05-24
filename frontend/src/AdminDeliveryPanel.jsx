@@ -9,6 +9,7 @@ export default function AdminDeliveryPanel() {
   const [orders, setOrders] = useState([]);
   const [deliverymen, setDeliverymen] = useState([]);
   const [message, setMessage] = useState("");
+  const [processingOrderId, setProcessingOrderId] = useState(null);
 
   async function loadAll() {
     try {
@@ -30,11 +31,14 @@ export default function AdminDeliveryPanel() {
 
   async function approvePayout(orderId) {
     try {
-      await api.patch(`/admin/delivery/orders/${orderId}/approve-payout`);
-      setMessage("Deliveryman payout/points approved.");
+      setProcessingOrderId(orderId);
+      const res = await api.patch(`/admin/delivery/orders/${orderId}/approve-payout`);
+      setMessage(res.data?.message || "Settlement updated.");
       await loadAll();
     } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to approve payout.");
+      setMessage(error.response?.data?.error || error.response?.data?.message || "Failed to approve payout.");
+    } finally {
+      setProcessingOrderId(null);
     }
   }
 
@@ -167,10 +171,19 @@ export default function AdminDeliveryPanel() {
                   <td>
                     {order.deliveryman_id &&
                     order.customer_received &&
-                    order.delivery_status === "delivered_by_deliveryman" &&
-                    order.delivery_payout_status !== "approved" ? (
-                      <button className="approve-btn" onClick={() => approvePayout(order.id)}>
-                        Approve Payout
+                    order.delivery_status === "delivered_by_deliveryman" ? (
+                      <button
+                        className="approve-btn"
+                        disabled={processingOrderId === order.id || Number(order.seller_settlement_count || 0) > 0}
+                        onClick={() => approvePayout(order.id)}
+                      >
+                        {processingOrderId === order.id
+                          ? "Processing..."
+                          : Number(order.seller_settlement_count || 0) > 0
+                            ? "Settlement Done"
+                            : order.delivery_payout_status === "approved"
+                              ? "Verify Seller Settlement"
+                              : "Approve Payout"}
                       </button>
                     ) : (
                       <span>N/A</span>

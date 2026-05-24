@@ -345,6 +345,11 @@ export default function VendorDashboardPage() {
           Earnings
         </button>
       </div>
+
+      {activePanel === "earnings" && (
+        <SellerEarningsPanel title="Vendor Earnings & Sale Records" />
+      )}
+
 {message && <div className="admin-message">{message}</div>}
 
       {activePanel === "products" && (
