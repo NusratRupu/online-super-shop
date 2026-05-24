@@ -182,14 +182,18 @@ export default function App() {
       ? "/account"
       : currentUser?.role === "vendor"
         ? "/vendor"
-        : "/login";
+        : currentUser?.role === "deliveryman"
+          ? "/deliveryman"
+          : "/login";
 
   const accountText =
     currentUser?.role === "customer"
       ? "My Account"
       : currentUser?.role === "vendor"
         ? "Vendor Panel"
-        : "Login";
+        : currentUser?.role === "deliveryman"
+          ? "Delivery Panel"
+          : "Login";
 
   return (
     <div>
@@ -213,8 +217,9 @@ export default function App() {
           />
         </div>
 
-        <nav>
-          <a href="/">Home</a>
+        <nav className="main-nav nav-with-icons">
+          <a href="/"><span className="nav-mini-icon">⌂</span>Home</a>
+
           <a
             href="#products"
             onClick={(event) => {
@@ -222,32 +227,67 @@ export default function App() {
               goToProducts();
             }}
           >
-            Shop
+            <span className="nav-mini-icon">□</span>Shop
           </a>
-          <a
-            href="/track-order"
-            onClick={(event) => {
-              if (currentUser?.role === "customer") {
-                event.preventDefault();
-                window.location.href = "/account";
-              } else if (currentUser?.role === "vendor") {
-                event.preventDefault();
-                window.location.href = "/vendor";
-              } else if (currentUser?.role === "admin") {
-                event.preventDefault();
-                window.location.href = "/admin";
-              }
-            }}
+
+          <button
+            type="button"
+            className="nav-round-icon-btn"
+            onClick={() => (window.location.href = currentUser?.role === "customer" ? "/account" : currentUser?.role === "vendor" ? "/vendor" : currentUser?.role === "admin" ? "/admin" : "/track-order")}
+            aria-label="Order Tracking"
           >
-            Track Order
-          </a>
-          <a href={currentUser?.role === "vendor" ? "/vendor" : "/vendor-login"}>Vendor</a>
-          <a href={currentUser?.role === "deliveryman" ? "/deliveryman" : "/deliveryman-login"}>Deliveryman</a>
-          {!currentUser && <a href="/register">Register</a>}
-          <button className="cart-btn" onClick={() => (window.location.href = "/cart")}>
-            Cart ({cartTotal})
+            <svg viewBox="0 0 24 24" className="nav-svg-icon">
+              <path d="M3 7h11v9H3z" />
+              <path d="M14 10h4l3 3v3h-7z" />
+              <circle cx="7" cy="18" r="2" />
+              <circle cx="18" cy="18" r="2" />
+            </svg>
+            <span className="nav-tooltip">Order Tracking</span>
           </button>
-          <a className="login-nav-btn" href={accountHref}>{accountText}</a>
+
+          <a href={currentUser?.role === "vendor" ? "/vendor" : "/vendor-login"}>
+            <span className="nav-mini-icon">▤</span>Vendor
+          </a>
+
+          <a href={currentUser?.role === "deliveryman" ? "/deliveryman" : "/deliveryman-login"}>
+            <span className="nav-mini-icon">◇</span>Delivery
+          </a>
+
+          <button className="nav-round-icon-btn cart-icon-btn-clean" onClick={() => (window.location.href = "/cart")} aria-label="Cart">
+            <svg viewBox="0 0 24 24" className="nav-svg-icon">
+              <path d="M4 5h2l2 10h10l2-7H8" />
+              <circle cx="10" cy="19" r="1.8" />
+              <circle cx="18" cy="19" r="1.8" />
+            </svg>
+            {cartTotal > 0 && <span className="cart-count-badge">{cartTotal}</span>}
+            <span className="nav-tooltip">Cart</span>
+          </button>
+
+          <a className="login-nav-btn" href={accountHref}>
+            <span className="nav-mini-icon">{currentUser ? "◉" : "♙"}</span>{accountText}
+          </a>
+
+          {!currentUser && (
+            <a href="/register">
+              <span className="nav-mini-icon">✎</span>Signup
+            </a>
+          )}
+
+          <button
+            type="button"
+            className="nav-round-icon-btn helpdesk-nav-btn"
+            onClick={() => window.dispatchEvent(new Event("open-support-chat"))}
+            aria-label="Helpdesk Support"
+          >
+            <svg viewBox="0 0 24 24" className="nav-svg-icon">
+              <path d="M5 12a7 7 0 0 1 14 0" />
+              <path d="M5 12v5h3v-5z" />
+              <path d="M16 12v5h3v-5z" />
+              <path d="M12 20h3c2 0 4-1 4-3" />
+              <circle cx="12" cy="12" r="1" />
+            </svg>
+            <span className="nav-tooltip">Helpdesk</span>
+          </button>
         </nav>
       </header>
 

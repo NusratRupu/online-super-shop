@@ -6,6 +6,7 @@ import AdminStockPanel from "./AdminStockPanel.jsx";
 import AdminProductApprovalsPanel from "./AdminProductApprovalsPanel.jsx";
 import AdminDeliveryPanel from "./AdminDeliveryPanel.jsx";
 import AdminSalesRecordsPanel from "./AdminSalesRecordsPanel.jsx";
+import AdminSupportPanel from "./AdminSupportPanel.jsx";
 import AdminGroupedProductsPanel from "./AdminGroupedProductsPanel.jsx";
 import AdminStockNotification from "./AdminStockNotification.jsx";
 import AdminUsersPanel from "./AdminUsersPanel.jsx";
@@ -332,6 +333,9 @@ export default function AdminPage({ onLogout }) {
         <button className={activePanel === "sales" ? "active" : ""} onClick={() => setActivePanel("sales")}>
           Sales Records
         </button>
+        <button className={activePanel === "support" ? "active" : ""} onClick={() => setActivePanel("support")}>
+          Support
+        </button>
       </div>
 
       {message && <div className="admin-message">{message}</div>}
@@ -425,6 +429,7 @@ export default function AdminPage({ onLogout }) {
       {activePanel === "approvals" && <AdminProductApprovalsPanel />}
       {activePanel === "delivery" && <AdminDeliveryPanel />}
       {activePanel === "sales" && <AdminSalesRecordsPanel />}
+      {activePanel === "support" && <AdminSupportPanel />}
 
       {activePanel === "users" && <AdminUsersPanel />}
 
