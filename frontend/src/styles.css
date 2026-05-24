@@ -3596,3 +3596,223 @@ body,
     justify-content: center;
   }
 }
+
+.floating-cart-wrap {
+  position: fixed;
+  right: 24px;
+  bottom: 94px;
+  z-index: 9998;
+}
+
+.floating-cart-btn {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 1px solid #d6eadb;
+  border-radius: 999px;
+  background: #eaf7ee;
+  color: #056839;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.floating-cart-svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.floating-cart-btn span {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 22px;
+  font-weight: 900;
+}
+
+.floating-cart-preview {
+  position: absolute;
+  right: 72px;
+  bottom: 0;
+  width: 290px;
+  max-height: 360px;
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.18);
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(8px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.floating-cart-wrap:hover .floating-cart-preview {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.floating-cart-preview h4 {
+  margin: 0 0 10px;
+  color: #056839;
+}
+
+.floating-cart-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.floating-cart-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #f8fafc;
+}
+
+.floating-cart-item strong,
+.floating-cart-item small {
+  display: block;
+}
+
+.floating-cart-item strong {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.floating-cart-item small {
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.floating-cart-preview button {
+  width: 100%;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #056839;
+  color: #ffffff;
+  padding: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .floating-cart-wrap {
+    right: 18px;
+    bottom: 92px;
+  }
+
+  .floating-cart-preview {
+    right: 0;
+    bottom: 70px;
+    width: min(290px, calc(100vw - 36px));
+  }
+}
+
+/* Final floating cart + support button polish */
+.floating-cart-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.floating-cart-svg {
+  display: block !important;
+  margin: 0 !important;
+  transform: translateY(0) !important;
+}
+
+.floating-cart-btn > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Keep only badge positioned; icon stays centered */
+.floating-cart-btn .cart-count-badge,
+.floating-cart-btn > span:not(.floating-cart-svg) {
+  position: absolute;
+}
+
+/* Make help/chat floating button more visible */
+.support-float-btn {
+  background: #056839 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 18px 45px rgba(5, 104, 57, 0.35) !important;
+}
+
+.support-float-btn:hover {
+  background: #034f2b !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.support-icon-main {
+  color: #ffffff !important;
+  font-size: 27px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Keep cart and support vertically clean on right side */
+.floating-cart-wrap {
+  right: 26px !important;
+  bottom: 112px !important;
+}
+
+.support-float-btn {
+  right: 26px !important;
+  bottom: 32px !important;
+}
+
+.support-headset-svg {
+  width: 31px !important;
+  height: 31px !important;
+  fill: none !important;
+  stroke: #ffffff !important;
+  stroke-width: 2.4 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.support-float-btn {
+  background: linear-gradient(145deg, #056839, #0a8a4a) !important;
+}
+
+.support-float-btn::after {
+  content: "Help";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 4px 6px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+}
