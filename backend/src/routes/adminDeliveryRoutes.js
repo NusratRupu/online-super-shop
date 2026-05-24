@@ -171,4 +171,55 @@ router.patch("/orders/:id/approve-payout", async (req, res) => {
   }
 });
 
+router.get("/deliverymen", async (req, res) => {
+  try {
+    const [deliverymen] = await db.query(`
+      SELECT
+        u.id, u.name, u.email, u.phone, u.status,
+        dp.area, dp.vehicle_type, dp.approval_status, dp.points
+      FROM users u
+      LEFT JOIN deliveryman_profiles dp ON dp.user_id = u.id
+      WHERE u.role = 'deliveryman'
+      ORDER BY u.id DESC
+    `);
+
+    res.json({ success: true, deliverymen });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to load deliverymen.", error: error.message });
+  }
+});
+
+router.patch("/deliverymen/:id/approve", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query("UPDATE users SET status = 'active' WHERE id = ? AND role = 'deliveryman'", [id]);
+
+    await db.query(
+      `INSERT INTO deliveryman_profiles (user_id, approval_status, points)
+       VALUES (?, 'approved', 0)
+       ON DUPLICATE KEY UPDATE approval_status = 'approved'`,
+      [id]
+    );
+
+    res.json({ success: true, message: "Deliveryman approved." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to approve deliveryman.", error: error.message });
+  }
+});
+
+router.patch("/deliverymen/:id/block", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query("UPDATE users SET status = 'blocked' WHERE id = ? AND role = 'deliveryman'", [id]);
+    await db.query("UPDATE deliveryman_profiles SET approval_status = 'blocked' WHERE user_id = ?", [id]);
+
+    res.json({ success: true, message: "Deliveryman blocked." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to block deliveryman.", error: error.message });
+  }
+});
+
 module.exports = router;
+

@@ -54,9 +54,13 @@ export default function DeliverymanLoginPage() {
         />
 
         <button type="submit">Login as Deliveryman</button>
-        <a href="/">Back to Website</a>
+        <div className="delivery-auth-links">
+          <a href="/deliveryman-register">Register as Deliveryman</a>
+          <a href="/">Back to Website</a>
+        </div>
       </form>
     </div>
   );
 }
+
 

@@ -19,6 +19,7 @@ const vendorRoutes = require("./src/routes/vendorRoutes");
 const customerResaleRoutes = require("./src/routes/customerResaleRoutes");
 const customerDeliveryRoutes = require("./src/routes/customerDeliveryRoutes");
 const deliverymanRoutes = require("./src/routes/deliverymanRoutes");
+const deliverymanAuthRoutes = require("./src/routes/deliverymanAuthRoutes");
 const adminDeliveryRoutes = require("./src/routes/adminDeliveryRoutes");
 const salesRecordsRoutes = require("./src/routes/salesRecordsRoutes");
 const uploadRoutes = require("./src/routes/uploadRoutes");
@@ -72,6 +73,7 @@ app.use("/api/admin/users", adminUserRoutes);
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/customer", customerResaleRoutes);
 app.use("/api/customer", customerDeliveryRoutes);
+app.use("/api/deliveryman-auth", deliverymanAuthRoutes);
 app.use("/api/deliveryman", deliverymanRoutes);
 app.use("/api/admin/delivery", adminDeliveryRoutes);
 app.use("/api/sales-records", salesRecordsRoutes);
@@ -82,6 +84,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`NityoMart BD API running on http://localhost:${PORT}`);
 });
+
 
 
 

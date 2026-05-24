@@ -35,10 +35,10 @@ async function register(req, res) {
       });
     }
 
-    if (!["customer", "vendor"].includes(role)) {
+    if (!["customer", "vendor", "deliveryman"].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: "Only customer and vendor registration is allowed",
+        message: "Only customer, vendor, and deliveryman registration is allowed",
       });
     }
 
@@ -59,7 +59,7 @@ async function register(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const status = role === "vendor" ? "pending" : "active";
+    const status = role === "customer" ? "active" : "pending";
 
     const [result] = await db.query(
       "INSERT INTO users (name, email, phone, password_hash, role, status) VALUES (?, ?, ?, ?, ?, ?)",
@@ -75,11 +75,25 @@ async function register(req, res) {
       );
     }
 
+    if (role === "deliveryman") {
+      await db.query(
+        "CREATE TABLE IF NOT EXISTS deliveryman_profiles (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL UNIQUE, area VARCHAR(150) DEFAULT NULL, vehicle_type VARCHAR(100) DEFAULT NULL, approval_status VARCHAR(30) NOT NULL DEFAULT 'pending', points INT NOT NULL DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+      );
+
+      await db.query(
+        "INSERT INTO deliveryman_profiles (user_id, area, vehicle_type, approval_status, points) VALUES (?, ?, ?, 'pending', 0)",
+        [userId, area || null, vehicle_type || null]
+      );
+    }
+
     res.status(201).json({
       success: true,
-      message: role === "vendor"
-        ? "Vendor registration submitted for admin approval"
-        : "Customer registered successfully",
+      message:
+        role === "vendor"
+          ? "Vendor registration submitted for admin approval"
+          : role === "deliveryman"
+            ? "Deliveryman registration submitted for admin approval"
+            : "Customer registered successfully",
     });
   } catch (error) {
     res.status(500).json({

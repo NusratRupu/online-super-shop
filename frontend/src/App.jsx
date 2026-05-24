@@ -10,6 +10,7 @@ import CheckoutPage from "./CheckoutPage.jsx";
 import VendorDashboardPage from "./VendorDashboardPage.jsx";
 import CustomerResalePage from "./CustomerResalePage.jsx";
 import DeliverymanLoginPage from "./DeliverymanLoginPage.jsx";
+import DeliverymanRegisterPage from "./DeliverymanRegisterPage.jsx";
 import DeliverymanDashboardPage from "./DeliverymanDashboardPage.jsx";
 import { getImageUrl } from "./utils/imageUrl";
 import { addToCart, cartCount } from "./utils/cartStore";
@@ -106,6 +107,10 @@ export default function App() {
 
   if (["/login", "/register", "/vendor-login", "/vendor-register"].includes(path)) {
     return <AccountPage />;
+  }
+
+  if (path === "/deliveryman-register") {
+    return <DeliverymanRegisterPage />;
   }
 
   if (path === "/deliveryman-login") {
